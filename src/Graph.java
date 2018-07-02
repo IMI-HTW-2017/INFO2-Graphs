@@ -32,7 +32,7 @@ public class Graph<T> {
             vertexFrom.getEdges().add(new Edge<>(vertexTo, weight));
     }
 
-    public int getWeightOfEdge(T from, T to) {
+    public double getWeightOfEdge(T from, T to) {
         Vertex<T> vertexFrom = getVertexFromData(from);
         Vertex<T> vertexTo = getVertexFromData(to);
 
@@ -55,7 +55,94 @@ public class Graph<T> {
         return vertices;
     }
 
-    private Vertex<T> getVertexFromData(T data) {
+    public List<Vertex<T>> getShortestPath(T from, T to) {
+        Queue<Vertex<T>> queue = new LinkedList<>();
+        Map<Vertex<T>, Vertex<T>> predecessor = new HashMap<>();
+        List<Vertex<T>> path = new ArrayList<>();
+
+        Vertex<T> vertexFrom = getVertexFromData(from);
+        Vertex<T> vertexTo = getVertexFromData(to);
+
+        queue.offer(vertexFrom);
+
+        while (!queue.isEmpty()) {
+            Vertex<T> vertex = queue.poll();
+
+            if (vertex.equals(vertexTo)) {
+
+                while (vertexTo != vertexFrom) {
+                    path.add(vertexTo);
+                    vertexTo = predecessor.get(vertexTo);
+                }
+
+                path.add(vertexTo);
+                Collections.reverse(path);
+
+                return path;
+            }
+
+            for (Edge<T> edge : vertex.getEdges()) {
+                if (!predecessor.containsKey(edge.getTo())) {
+                    queue.offer(edge.getTo());
+                    predecessor.put(edge.getTo(), vertex);
+                }
+            }
+        }
+
+        return path;
+    }
+
+    public List<Vertex<T>> getCheapestPath(T from, T to) {
+        List<Vertex<T>> queue = new ArrayList<>();
+        Map<Vertex<T>, Vertex<T>> predecessor = new HashMap<>();
+        Map<Vertex<T>, Double> minDistance = new HashMap<>();
+        List<Vertex<T>> pathFound = new ArrayList<>();
+        List<Vertex<T>> path = new ArrayList<>();
+
+        Vertex<T> vertexFrom = getVertexFromData(from);
+        Vertex<T> vertexTo = getVertexFromData(to);
+
+        vertices.stream().forEach((v) -> minDistance.put(v, Double.POSITIVE_INFINITY));
+
+        minDistance.put(vertexFrom, 0.0);
+        queue.add(vertexFrom);
+
+        while (!queue.isEmpty()) {
+            Vertex<T> vertex = queue.get(0);
+            for (Vertex<T> v : queue) {
+                if (minDistance.get(v) < minDistance.get(vertex)) {
+                    vertex = v;
+                }
+            }
+            queue.remove(vertex);
+
+            for (Edge<T> edge : vertex.getEdges()) {
+                Vertex<T> neighbor = edge.getTo();
+                double distanceThroughVertex = minDistance.get(vertex) + edge.getWeight();
+
+                if (distanceThroughVertex < minDistance.get(neighbor)) {
+                    queue.remove(neighbor);
+                    minDistance.put(neighbor, distanceThroughVertex);
+                    pathFound.add(neighbor);
+                    predecessor.put(neighbor, vertex);
+                    queue.add(neighbor);
+                }
+            }
+        }
+
+        if (pathFound.contains(vertexTo)) {
+            while (vertexTo != vertexFrom) {
+                path.add(vertexTo);
+                vertexTo = predecessor.get(vertexTo);
+            }
+
+            path.add(vertexTo);
+            Collections.reverse(path);
+        }
+        return path;
+    }
+
+    public Vertex<T> getVertexFromData(T data) {
         for (Vertex<T> vertex : vertices) {
             if (vertex.getData().equals(data))
                 return vertex;
@@ -64,7 +151,7 @@ public class Graph<T> {
         return null;
     }
 
-    public class Vertex<T> {
+    class Vertex<T> {
 
         private T data;
         private List<Edge<T>> edges;
@@ -91,27 +178,18 @@ public class Graph<T> {
             return edges;
         }
 
-        void addEdge(Edge<T> edge) {
-            for (Edge<T> e : edges) {
-                if (e.getTo().equals(edge.getTo())) {
-                    throw new RuntimeException("Edge already exists!");
-                }
-            }
-            edges.add(edge);
-        }
-
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof Vertex)
-                return data.equals(((Vertex)obj).data);
+                return data.equals(((Vertex) obj).data);
             else
                 return false;
         }
     }
 
-    public class Edge<T> implements Comparable {
+    class Edge<T> {
         private Vertex to;
-        private int weight;
+        private double weight;
 
         Edge(Vertex<T> to, int weight) {
             this.to = to;
@@ -122,22 +200,8 @@ public class Graph<T> {
             return to;
         }
 
-        int getWeight() {
+        double getWeight() {
             return weight;
-        }
-
-        @Override
-        public int compareTo(Object o) {
-            if (o instanceof Edge) {
-                if (weight < ((Edge) o).weight) {
-                    return -1;
-                } else if (weight > ((Edge) o).weight) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            }
-            return 1;
         }
     }
 
