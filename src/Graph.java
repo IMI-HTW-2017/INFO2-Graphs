@@ -51,6 +51,10 @@ public class Graph<T> {
             return vertex.getEdges();
     }
 
+    public List<Vertex<T>> getVertices() {
+        return vertices;
+    }
+
     private Vertex<T> getVertexFromData(T data) {
         for (Vertex<T> vertex : vertices) {
             if (vertex.getData().equals(data))
@@ -60,7 +64,7 @@ public class Graph<T> {
         return null;
     }
 
-    private class Vertex<T> {
+    public class Vertex<T> {
 
         private T data;
         private List<Edge<T>> edges;
@@ -87,6 +91,15 @@ public class Graph<T> {
             return edges;
         }
 
+        void addEdge(Edge<T> edge) {
+            for (Edge<T> e : edges) {
+                if (e.getTo().equals(edge.getTo())) {
+                    throw new RuntimeException("Edge already exists!");
+                }
+            }
+            edges.add(edge);
+        }
+
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof Vertex)
@@ -96,7 +109,7 @@ public class Graph<T> {
         }
     }
 
-    private class Edge<T> implements Comparable {
+    public class Edge<T> implements Comparable {
         private Vertex to;
         private int weight;
 
