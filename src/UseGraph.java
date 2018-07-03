@@ -17,12 +17,8 @@ public class UseGraph {
 
         createRandomGraph(vertices, numberOfEdges);
         printGraph();
-
-        System.out.println("Shortest path from A to Z:");
-        System.out.println(pathToString(graph.getShortestPath("A", "Z")));
-
-        System.out.println("Cheapest path from A to Z:");
-        System.out.println(pathToString(graph.getCheapestPath("A", "Z")));
+        getRandomShortestPath(graph);
+        getRandomCheapestPath(graph);
     }
 
     private static void createRandomGraph(String[] vertices, int numberOfEdges) {
@@ -54,6 +50,22 @@ public class UseGraph {
 
             System.out.println();
         }
+    }
+
+    private static void getRandomShortestPath(Graph<String> g) {
+        String from = g.getVertices().get(random.nextInt(g.getVertices().size())).getData();
+        String to = g.getVertices().get(random.nextInt(g.getVertices().size())).getData();
+
+        System.out.println("Shortest path from " + from + " to " + to + ":");
+        System.out.println(pathToString(graph.getShortestPath(from, to)));
+    }
+
+    private static void getRandomCheapestPath(Graph<String> g) {
+        String from = g.getVertices().get(random.nextInt(g.getVertices().size())).getData();
+        String to = g.getVertices().get(random.nextInt(g.getVertices().size())).getData();
+
+        System.out.println("Cheapest path from " + from + " to " + to + ":");
+        System.out.println(pathToString(graph.getCheapestPath(from, to)));
     }
 
     private static String pathToString(List<Graph<String>.Vertex<String>> path) {
