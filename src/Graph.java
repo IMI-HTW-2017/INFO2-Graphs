@@ -32,16 +32,6 @@ public class Graph<T> {
             vertexFrom.getEdges().add(new Edge<>(vertexTo, weight));
     }
 
-    public double getWeightOfEdge(T from, T to) {
-        Vertex<T> vertexFrom = getVertexFromData(from);
-        Vertex<T> vertexTo = getVertexFromData(to);
-
-        if (vertexFrom == null || vertexTo == null)
-            return Integer.MAX_VALUE;
-        else
-            return vertexFrom.getEdgeTo(vertexTo).getWeight();
-    }
-
     public List<Edge<T>> getEdges(T element) {
         Vertex<T> vertex = getVertexFromData(element);
 
